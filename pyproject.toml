@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rcpack"
+version = "0.1.0"
+description = "Repository Context Packager CLI for LLMs"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "PyYAML>=6.0"
+]
+
+[project.scripts]
+repo-contextor = "rcpack.cli:main"
