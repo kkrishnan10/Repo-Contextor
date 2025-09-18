@@ -14,6 +14,7 @@ def render_json(root, repo_info, tree_text, files, total_files, total_lines) -> 
         "structure": tree_text,
         "files": files,
         "summary": {"total_files": total_files, "total_lines": total_lines},
+        "recent_changes": recent_files or [],
     }
     return json.dumps(data, indent=2, ensure_ascii=False)
 
@@ -27,5 +28,6 @@ def render_yaml(root, repo_info, tree_text, files, total_files, total_lines) -> 
         "structure": tree_text,
         "files": files,
         "summary": {"total_files": total_files, "total_lines": total_lines},
+        "recent_changes": recent_files or [],
     }
     return yaml.safe_dump(data, sort_keys=False, allow_unicode=True)
