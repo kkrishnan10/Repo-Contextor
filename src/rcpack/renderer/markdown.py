@@ -39,11 +39,11 @@ def render_markdown(root: str, repo_info: Dict[str, Any], tree_text: str,
     lines.append("")
 
     # will produce recent files 
+    # Recent files (fixed)
     if recent_files:
-        lines.append("## Recent Changes (last 7 days)")
-        lines.append("")
-        for f in recent_files:
-            lines.append(f"- {f}")
+        lines.append("## Recent Changes")
+        for file, age in recent_files.items():
+            lines.append(f"- {file} (modified {age})")
         lines.append("")
     
     # File contents
