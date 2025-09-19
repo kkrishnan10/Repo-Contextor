@@ -345,7 +345,3 @@ The output format is specifically designed to work well with Large Language Mode
 - Complete project context in a single file
 - Multiple output formats (Markdown, JSON, YAML)
 - Optimized for token efficiency
-
----
-
-**Made with care for developers who want better AI assistance with their code.**
