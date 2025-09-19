@@ -26,6 +26,7 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **Error Handling**: Gracefully handles permission errors and provides helpful messages
 - **Multiple Output Formats**: Supports Markdown, JSON, and YAML formats
 - **Flexible Output**: Write to stdout or save to a file
+- **Recent Changes Filter**: Give the files which are updated in last 7days with the time when it was recently modified.
 
 ## Installation
 
@@ -77,6 +78,12 @@ repo-contextor . -f json -o context.json
 
 # Generate YAML format
 repo-contextor . -f yaml -o context.yaml
+
+# Include only files modified in the last 7 days
+repo-contextor . --recent
+
+# Combine with output file
+repo-contextor . --recent -o recent-changes.md
 ```
 
 ### Command Line Options
@@ -87,6 +94,7 @@ repo-contextor . -f yaml -o context.yaml
 | `--output` | `-o` | Output file path (default: stdout) | `-o context.md` |
 | `--format` | `-f` | Output format: text, json, yaml (default: text) | `-f json` |
 | `--help` | `-h` | Show help message | `-h` |
+| `--recent`  | `-r`  | Include only files modified in the last 7 days    | `repo-contextor . -r -o recent.md` |
 
 ### Advanced Examples
 
@@ -99,6 +107,10 @@ repo-contextor . -f json -o api-context.json
 
 # Create YAML configuration
 repo-contextor . -f yaml -o project-config.yaml
+
+# Generate files which are changed recently in 7 days
+repo-contextor . -r --output recent-changes.txt
+
 ```
 
 ## Output Format
@@ -120,6 +132,14 @@ Project path and identification
 
 ### 4. Directory Structure
 Clean tree visualization showing project organization
+
+### 5. Recent Changes (if `--recent` is used)
+
+- Lists files modified in the last 7 days.
+- Shows relative file paths along with how long ago each file was modified
+- Helps focus on recently updated parts of the project.
+- Can be combined with `--output` or `--format` to save or change the output type.
+
 
 ### 5. File Contents
 Each file's content with:
@@ -154,6 +174,9 @@ When you run `repo-contextor .`, the output looks like this:
 ├── README.md
 └── requirements.txt
 ```
+## Recent Changes
+- src/main.py (modified 2 days ago)
+- src/utils/helpers.py (modified 5 days ago)
 
 ## File Contents
 
@@ -322,7 +345,3 @@ The output format is specifically designed to work well with Large Language Mode
 - Complete project context in a single file
 - Multiple output formats (Markdown, JSON, YAML)
 - Optimized for token efficiency
-
----
-
-**Made with care for developers who want better AI assistance with their code.**

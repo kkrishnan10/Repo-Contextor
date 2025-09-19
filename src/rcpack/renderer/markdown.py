@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 
 def render_markdown(root: str, repo_info: Dict[str, Any], tree_text: str, 
-                   files: Dict[str, str], total_files: int, total_lines: int) -> str:
+                   files: Dict[str, str], total_files: int, total_lines: int, recent_files=None) -> str:
     """Render repository context as markdown."""
     
     lines = []
@@ -37,6 +37,14 @@ def render_markdown(root: str, repo_info: Dict[str, Any], tree_text: str,
     lines.append(tree_text)
     lines.append("```")
     lines.append("")
+
+    # will produce recent files 
+    # Recent files (fixed)
+    if recent_files:
+        lines.append("## Recent Changes")
+        for file, age in recent_files.items():
+            lines.append(f"- {file} (modified {age})")
+        lines.append("")
     
     # File contents
     lines.append("## File Contents")

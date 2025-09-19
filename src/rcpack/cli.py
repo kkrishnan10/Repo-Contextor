@@ -10,6 +10,7 @@ from .treeview import create_tree_view
 from .renderer.markdown import render_markdown
 from .renderer.jsonyaml import render_json, render_yaml
 from .io_utils import write_output
+from datetime import datetime, timedelta
 
 
 def main():
@@ -32,6 +33,13 @@ def main():
         default="text",
         help="Output format (default: text)"
     )
+
+    """ This will read -r from the console and able to search it with this"""
+    parser.add_argument(
+    "-r", "--recent",
+    action="store_true",
+    help="Include only files modified in the last 7 days"
+    )
     
     args = parser.parse_args()
     
@@ -46,6 +54,21 @@ def main():
         
         # Discover files
         discovered_files = discover_files([repo_path], repo_path, [], [])
+        
+        # will check the file in last 7 days
+        recent_files_info = {}
+        if args.recent:
+            seven_days_ago = datetime.now() - timedelta(days=7)
+            recent_files = []
+            for f in discovered_files:
+                try:
+                    mtime = datetime.fromtimestamp(f.stat().st_mtime)
+                    if mtime >= seven_days_ago:
+                        recent_files.append(f)
+                        recent_files_info[str(f.relative_to(repo_path))] = human_readable_age(mtime)     
+                except Exception:
+                    continue
+            discovered_files = recent_files
         
         # Read file contents
         files_data = {}
@@ -71,17 +94,20 @@ def main():
         if args.format == "json":
             content = render_json(
                 str(repo_path), repo_info, tree_text, 
-                files_data, total_files, total_lines
+                files_data, total_files, total_lines,
+                recent_files=recent_files_info if args.recent else {}
             )
         elif args.format == "yaml":
             content = render_yaml(
                 str(repo_path), repo_info, tree_text, 
-                files_data, total_files, total_lines
+                files_data, total_files, total_lines,
+                recent_files=recent_files_info if args.recent else {}
             )
         else:  # text/markdown
             content = render_markdown(
                 str(repo_path), repo_info, tree_text, 
-                files_data, total_files, total_lines
+                files_data, total_files, total_lines,
+                recent_files=recent_files_info if args.recent else {}
             )
         
         if args.output:
@@ -96,6 +122,21 @@ def main():
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
+# this will convert age and give us the difference
+def human_readable_age(mtime: datetime) -> str:
+    delta = datetime.now() - mtime
+    days = delta.days
+    seconds = delta.seconds
+    if days > 0:
+        return f"{days} day{'s' if days != 1 else ''} ago"
+    elif seconds >= 3600:
+        hours = seconds // 3600
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    elif seconds >= 60:
+        minutes = seconds // 60
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    else:
+        return "just now"
 
 if __name__ == "__main__":
     main()
