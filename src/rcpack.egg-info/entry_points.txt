@@ -1,2 +1,0 @@
-[console_scripts]
-repo-contextor = rcpack.cli:main
