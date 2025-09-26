@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 
 def render_markdown(root: str, repo_info: Dict[str, Any], tree_text: str, 
-                   files: Dict[str, str], total_files: int, total_lines: int, recent_files=None) -> str:
+                   files: Dict[str, str], total_files: int, total_lines: int, recent_files=None, file_sizes=None) -> str:
     """Render repository context as markdown."""
     
     lines = []
@@ -51,7 +51,11 @@ def render_markdown(root: str, repo_info: Dict[str, Any], tree_text: str,
     lines.append("")
     
     for file_path, content in sorted(files.items()):
-        lines.append(f"### {file_path}")
+        if file_sizes and file_path in file_sizes:
+            size_bytes = file_sizes[file_path]
+            lines.append(f"### {file_path} ({size_bytes} bytes)")
+        else:
+            lines.append(f"### {file_path}")
         lines.append("")
         
         # Detect language for syntax highlighting
