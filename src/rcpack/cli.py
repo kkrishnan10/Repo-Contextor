@@ -40,6 +40,11 @@ def main():
     action="store_true",
     help="Include only files modified in the last 7 days"
     )
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Print detailed progress information to stderr"
+    )
     
     args = parser.parse_args()
     
@@ -50,10 +55,16 @@ def main():
             sys.exit(1)
             
         # Get repository information
+        if args.verbose:
+            print(f"Analyzing repository: {repo_path}", file=sys.stderr)
         repo_info = get_git_info(repo_path)
         
         # Discover files
+        if args.verbose:
+            print(f"Discovering files in: {repo_path}", file=sys.stderr)
         discovered_files = discover_files([repo_path], repo_path, [], [])
+        if args.verbose:
+            print(f"Found {len(discovered_files)} files", file=sys.stderr)
         
         # will check the file in last 7 days
         recent_files_info = {}
@@ -75,15 +86,23 @@ def main():
         for file_path in discovered_files:
             try:
                 relative_path = file_path.relative_to(repo_path)
+                if args.verbose:
+                    print(f"Reading file: {relative_path}", file=sys.stderr)
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 files_data[str(relative_path)] = content
             except (UnicodeDecodeError, PermissionError):
+                if args.verbose:
+                    print(f"Skipping binary/unreadable file: {relative_path}", file=sys.stderr)
                 files_data[str(relative_path)] = f"[Binary or unreadable file: {file_path.name}]"
             except Exception:
+                if args.verbose:
+                    print(f"Error reading file: {relative_path}", file=sys.stderr)
                 continue
         
         # Create tree view
+        if args.verbose:
+            print("Generating directory tree", file=sys.stderr)
         tree_text = create_tree_view(repo_path, files_data)
         
         # Count totals
@@ -91,6 +110,8 @@ def main():
         total_lines = sum(len(content.splitlines()) for _, content in files_data.items())
         
         # Render based on format
+        if args.verbose:
+            print(f"Rendering output in {args.format} format", file=sys.stderr)
         if args.format == "json":
             content = render_json(
                 str(repo_path), repo_info, tree_text, 
