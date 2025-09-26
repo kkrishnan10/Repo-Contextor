@@ -72,13 +72,16 @@ def main():
         
         # Read file contents
         files_data = {}
+        file_sizes = {}
         for file_path in discovered_files:
             try:
                 relative_path = file_path.relative_to(repo_path)
+                file_sizes[str(relative_path)] = file_path.stat().st_size
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 files_data[str(relative_path)] = content
             except (UnicodeDecodeError, PermissionError):
+                file_sizes[str(relative_path)] = file_path.stat().st_size if file_path.exists() else 0
                 files_data[str(relative_path)] = f"[Binary or unreadable file: {file_path.name}]"
             except Exception:
                 continue
@@ -95,19 +98,22 @@ def main():
             content = render_json(
                 str(repo_path), repo_info, tree_text, 
                 files_data, total_files, total_lines,
-                recent_files=recent_files_info if args.recent else {}
+                recent_files=recent_files_info if args.recent else {},
+                file_sizes=file_sizes
             )
         elif args.format == "yaml":
             content = render_yaml(
                 str(repo_path), repo_info, tree_text, 
                 files_data, total_files, total_lines,
-                recent_files=recent_files_info if args.recent else {}
+                recent_files=recent_files_info if args.recent else {},
+                file_sizes=file_sizes
             )
         else:  # text/markdown
             content = render_markdown(
                 str(repo_path), repo_info, tree_text, 
                 files_data, total_files, total_lines,
-                recent_files=recent_files_info if args.recent else {}
+                recent_files=recent_files_info if args.recent else {},
+                file_sizes=file_sizes
             )
         
         if args.output:
